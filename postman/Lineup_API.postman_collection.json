@@ -1,0 +1,231 @@
+{
+  "info": {
+    "name": "Music Festival Line-Up API",
+    "description": "ICT251 Activity 4, Question 7. Run the requests 1 to 6 in order.",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "item": [
+    {
+      "name": "1. GET all records",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "{{baseUrl}}/api/lineup",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "api",
+            "lineup"
+          ]
+        },
+        "description": "List all line-up records."
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test('Status is 200', () => pm.response.to.have.status(200));",
+              "pm.test('Response is a JSON array', () => pm.expect(pm.response.json()).to.be.an('array'));"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "2. GET one record",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "{{baseUrl}}/api/lineup/1",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "api",
+            "lineup",
+            "1"
+          ]
+        },
+        "description": "Get the record with id 1."
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test('Status is 200', () => pm.response.to.have.status(200));",
+              "pm.test('Has an id', () => pm.expect(pm.response.json()).to.have.property('id'));"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "3. POST create a record",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "url": {
+          "raw": "{{baseUrl}}/api/lineup",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "api",
+            "lineup"
+          ]
+        },
+        "description": "Create a record. The new id is saved automatically in the collection variable newId.",
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"festival_name\": \"Octoberfest\",\n  \"artist_name\": \"Vincenzo Mbale\",\n  \"stage\": \"Main Stage\",\n  \"genre\": \"R&B\",\n  \"performance_date\": \"2026-10-24\",\n  \"start_time\": \"22:19:00\"\n}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        }
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test('Status is 201', () => pm.response.to.have.status(201));",
+              "const data = pm.response.json();",
+              "pm.collectionVariables.set('newId', data.id);",
+              "pm.test('New id saved for PUT and DELETE', () => pm.expect(data.id).to.exist);"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "4. PUT update the record",
+      "request": {
+        "method": "PUT",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "url": {
+          "raw": "{{baseUrl}}/api/lineup/{{newId}}",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "api",
+            "lineup",
+            "{{newId}}"
+          ]
+        },
+        "description": "Update the record created in step 3. Send all fields.",
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"festival_name\": \"Octoberfest\",\n  \"artist_name\": \"Vincenzo Mbale\",\n  \"stage\": \"Second Stage\",\n  \"genre\": \"Afrobeat\",\n  \"performance_date\": \"2026-10-24\",\n  \"start_time\": \"22:19:00\"\n}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        }
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test('Status is 200', () => pm.response.to.have.status(200));",
+              "pm.test('Stage was updated', () => pm.expect(pm.response.json().stage).to.eql('Second Stage'));"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "5. DELETE the record",
+      "request": {
+        "method": "DELETE",
+        "header": [],
+        "url": {
+          "raw": "{{baseUrl}}/api/lineup/{{newId}}",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "api",
+            "lineup",
+            "{{newId}}"
+          ]
+        },
+        "description": "Delete the record created in step 3."
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test('Status is 200', () => pm.response.to.have.status(200));"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "6. GET deleted record (expect 404)",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "{{baseUrl}}/api/lineup/{{newId}}",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "api",
+            "lineup",
+            "{{newId}}"
+          ]
+        },
+        "description": "Optional proof that the delete worked."
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test('Status is 404', () => pm.response.to.have.status(404));"
+            ]
+          }
+        }
+      ]
+    }
+  ],
+  "variable": [
+    {
+      "key": "baseUrl",
+      "value": "http://localhost:3000"
+    },
+    {
+      "key": "newId",
+      "value": ""
+    }
+  ]
+}
